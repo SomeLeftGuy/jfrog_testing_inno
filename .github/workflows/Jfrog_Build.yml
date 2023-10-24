@@ -31,11 +31,9 @@ jobs:
         env:
           JF_URL: http://localhost:8082
           JF_ACCESS_TOKEN: ${{secrets.JFROG_ACCESS_TOKEN}}
-      - name: Add server config to Jfrog CLI
-         # export SERVER_ID="jfrog_test"
-        run: |
+      - run: |
           
-           jf c add $SERVER_ID --url=http://localhost:8082 --access-token=${{secrets.JFROG_ACCESS_TOKEN}}
+           jf c add $SERVER_ID --url=$URL --access-token=$ACCESS_TOKEN
 
       - name: Push build to Artifactory
         run: |
