@@ -40,8 +40,8 @@ jobs:
 
       - name: Push build to Artifactory
         env: 
-          JF_ACCESS_TOKEN: ${{secrets.JFROG_ACCESS_KEY}}
+          JF_ACCESS_TOKEN: ${{secrets.JFROG_PASSWORD}}
         run: |
-          jf rt u "index.html" generic-local --user=github --password="$ACCESS_TOKEN"
+          jf rt u "index.html" generic-local --url="http://artifactory.localhost:8082/" --user="github" --password="$ACCESS_TOKEN"
           jf rt build-publish latest 1
 #43 --url http://localhost:8082/artifactory/  --access-token $ACCESS_TOKEN
