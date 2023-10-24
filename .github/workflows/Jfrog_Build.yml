@@ -37,5 +37,5 @@ jobs:
 
       - name: Push build to Artifactory
         run: |
-          jf rt upload "index.html" generic-local/ --build-name latest --build-number 1 --url http://localhost:8082
+          jf rt upload "index.html" generic-local/ --build-name latest --build-number 1 --url http://localhost:8082/artifactory/
           jf rt build-publish latest 1
