@@ -39,6 +39,8 @@ jobs:
            jf c add jfrog_test --url=$URL --access-token=$ACCESS_TOKEN
 
       - name: Push build to Artifactory
+        env: 
+          JF_ACCESS_TOKEN: ${{secrets.JFROG_ACCESS_KEY}}
         run: |
           jf rt upload "index.html" generic-local/ --build-name latest --url "http://localhost:8082/artifactory/"
           jf rt build-publish latest 1
