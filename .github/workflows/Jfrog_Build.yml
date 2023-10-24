@@ -42,6 +42,6 @@ jobs:
         env: 
           JF_ACCESS_TOKEN: ${{secrets.JFROG_ACCESS_KEY}}
         run: |
-          jf rt upload "index.html" generic-local/ --access-token $ACCESS_TOKEN --url "http://localhost:8081/artifactory/"
+          jf rt upload "index.html" generic-local/ --access-token "$ACCESS_TOKEN" --url "http://localhost:8081/artifactory/"
           jf rt build-publish latest 1
 #43 --url http://localhost:8082/artifactory/  --access-token $ACCESS_TOKEN
