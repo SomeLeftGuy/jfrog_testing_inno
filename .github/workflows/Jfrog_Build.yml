@@ -29,7 +29,7 @@ jobs:
       - name: Setup Jfrog
         uses: jfrog/setup-jfrog-cli@v3
         env:
-          JF_URL: localhost:8082
+          JF_URL: localhost:8082/event/api/v1
           JF_USER: admin
           JF_PASSWORD: Password1
       - run: jf rt ping
