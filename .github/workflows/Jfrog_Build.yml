@@ -19,7 +19,7 @@ jobs:
   build:
     env:
       JF_URL: http://localhost:8082/artifactory
-      JF_ACCESS_TOKEN: ${{secrets.JFROG_PASSWORD}}
+      JF_ACCESS_TOKEN: ${{secrets.JFROG_ACCESS_KEY}}
     # The type of runner that the job will run on
     runs-on: self-hosted
 
@@ -33,7 +33,7 @@ jobs:
         uses: jfrog/setup-jfrog-cli@v3
         env:
           JF_URL: http://localhost:8082
-         # JF_ACCESS_TOKEN: ${{secrets.JFROG_ACCESS_KEY}}
+          JF_ACCESS_TOKEN: ${{secrets.JFROG_ACCESS_KEY}}
       - run: |
           
            jf c add --url=$URL --user="github" --access-token="$ACCESS_TOKEN" --interactive=false --insecure-tls=true
