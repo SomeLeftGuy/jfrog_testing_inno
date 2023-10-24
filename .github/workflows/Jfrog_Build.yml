@@ -35,7 +35,7 @@ jobs:
          # export SERVER_ID="jfrog_test"
         run: |
           
-           jf c add $SERVER_ID --url=http://localhost:8082 --access-token=${{secrets.JFORG_ACCESS_TOKEN}}
+           jf c add $SERVER_ID --url=http://localhost:8082 --access-token=${{secrets.JFROG_ACCESS_TOKEN}}
 
       - name: Push build to Artifactory
         run: |
