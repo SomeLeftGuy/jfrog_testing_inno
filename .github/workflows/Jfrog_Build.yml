@@ -33,10 +33,10 @@ jobs:
         uses: jfrog/setup-jfrog-cli@v3
         env:
           JF_URL: http://localhost:8082
-          JF_ACCESS_TOKEN: ${{secrets.PASSWORD}}
+          JF_ACCESS_TOKEN: ${{secrets.JFROG_PASSWORD}}
       - run: |
           
-          jf c add --url=http://10.202.15.58:8082 --user="github" --password="cmVmdGtuOjAxOjAwMDAwMDAwMDA6T3ppSW9ubmlhZVVibE5XUUFqSVpPQXkwalZR" --interactive=false --insecure-tls=true
+          jf c add --url=http://10.202.15.58:8082 --user="github" --password="${{secrets.JFROG_PASSWORD}}" --interactive=false --insecure-tls=true
 
       - name: Push build to Artifactory
         # env: 
