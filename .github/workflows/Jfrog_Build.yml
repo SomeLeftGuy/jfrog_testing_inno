@@ -31,4 +31,12 @@ jobs:
         env:
           JF_URL: http://localhost:8082
           JF_ACCESS_TOKEN: ${{secrets.JFROG_ACCESS_TOKEN}}
-      - run: jf rt ping
+      - name: Add server config to Jfrog CLI
+      - run: |
+         export SERVER_ID="jfrog_test"
+         jf c add $SERVER_ID --url=http://localhost:8082 --access-token=${{secrets.JFORG_ACCESS_TOKEN}}
+
+      - name: Push build to Artifactory
+        run: |
+          jf rt upload "index.html" repositories/local/generic-local/ --build-name latest --build-number 1
+          jf rt build-publish latest 1
