@@ -18,7 +18,7 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     env:
-      JF_URL: http://localhost:8082
+      JF_URL: http://localhost:8082/artifactory
       JF_ACCESS_TOKEN: ${{secrets.JFROG_ACCESS_KEY}}
     # The type of runner that the job will run on
     runs-on: self-hosted
@@ -36,12 +36,12 @@ jobs:
           JF_ACCESS_TOKEN: ${{secrets.JFROG_ACCESS_KEY}}
       - run: |
           
-           jf c add jfrog_test --url=$URL --access-token=$ACCESS_TOKEN
+           jf c add --artifactory-url=$URL --access-token=$ACCESS_TOKEN
 
       - name: Push build to Artifactory
         env: 
           JF_ACCESS_TOKEN: ${{secrets.JFROG_ACCESS_KEY}}
         run: |
-          jf rt upload "index.html" generic-local/ --access-token "$ACCESS_TOKEN" --url "http://localhost:8081/artifactory/"
+          jf rt upload "index.html" generic-local/
           jf rt build-publish latest 1
 #43 --url http://localhost:8082/artifactory/  --access-token $ACCESS_TOKEN
