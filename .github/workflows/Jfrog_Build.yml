@@ -18,8 +18,8 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     env:
-      JF_URL: http://localhost:8082/artifactory
-      JF_ACCESS_TOKEN: ${{secrets.JFROG_ACCESS_KEY}}
+      JF_URL: http://10.202.15.58:8082
+      JF_ACCESS_TOKEN: ${{secrets.JFROG_PASSWORD}}
     # The type of runner that the job will run on
     runs-on: self-hosted
 
