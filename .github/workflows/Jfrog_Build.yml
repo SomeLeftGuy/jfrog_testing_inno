@@ -17,9 +17,11 @@ on:
 jobs:
   # This workflow contains a single job called "build"
   build:
+  
     env:
       JF_URL: http://10.202.15.58:8082
       JF_ACCESS_TOKEN: ${{secrets.JFROG_PASSWORD}}
+      
     # The type of runner that the job will run on
     runs-on: self-hosted
 
@@ -27,21 +29,28 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
-
-      # Runs a single command using the runners shell
+      
+      - name: Get branch name
+        id: branch-name
+        uses: tj-actions/branch-names@v7
+        
+      - name: Install jq
+        uses: dcarbone/install-jq-action@v2.0.2
+        
+      #Setting up jfrog and adding server
       - name: Setup Jfrog
         uses: jfrog/setup-jfrog-cli@v3
         env:
-          JF_URL: http://localhost:8082
           JF_ACCESS_TOKEN: ${{secrets.JFROG_PASSWORD}}
       - run: |
-          
           jf c add --url=http://10.202.15.58:8082 --user="github" --password="${{secrets.JFROG_PASSWORD}}" --interactive=false --insecure-tls=true
-
+        
       - name: Push build to Artifactory
-        # env: 
-        #   JF_ACCESS_TOKEN: ${{secrets.JFROG_PASSWORD}}
+        env: 
+        # This abomination gets current build number, don't ask
+        #[array](ls).name.Trim(".txt") -replace '[a-zA-z-]'
+           BUILD_NUMBER: $(jf rt s "generic-local" | jq 'map(.props."build.number")' | grep -Eo '[0-9]{1,9}')
         run: |
-          jf rt u "index.html" generic-local 
+          jf rt u "index.html" generic-local --build-number=$BUILD_NUMBER
+          
           jf rt build-publish latest 1
-#43 --url http://localhost:8082/artifactory/  --access-token $ACCESS_TOKEN
