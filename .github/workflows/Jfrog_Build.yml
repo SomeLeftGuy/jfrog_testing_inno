@@ -54,11 +54,11 @@ jobs:
           JF_ACCESS_TOKEN: ${{secrets.JFROG_PASSWORD}}
       - run: |
           jf c add --url=http://10.202.15.58:8082 --user="github" --password="${{secrets.JFROG_PASSWORD}}" --interactive=false --insecure-tls=true
-      - run: ::set-output name=build::$(((jf rt s "generic-local/jfrog_test/" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[0]) 
+      - run: echo ::set-output name=build::$(((jf rt s "generic-local/jfrog_test/" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[0]) 
         id: last    
-      - run: ::set-output name=build::$(((jf rt s "generic-local/jfrog_test/" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[1]) 
+      - run: echo ::set-output name=build::$(((jf rt s "generic-local/jfrog_test/" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[1]) 
         id: prelast 
-      - run: ::set-output name=build::$(((jf rt s "generic-local/jfrog_test/" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[2]) 
+      - run: echo ::set-output name=build::$(((jf rt s "generic-local/jfrog_test/" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[2]) 
         id: preprelast 
       - name: Push build to Artifactory
         env: 
