@@ -41,7 +41,7 @@ jobs:
       #   id: branch-name
       #   uses: tj-actions/branch-names@v7
         
-      - run: '[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12'
+      - run: '[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls, [Net.SecurityProtocolType]::Tls11, [Net.SecurityProtocolType]::Tls12, [Net.SecurityProtocolType]::Ssl3'
         id: tls
       - name: Install jq
         if: steps.tls.outcome == 'success'
