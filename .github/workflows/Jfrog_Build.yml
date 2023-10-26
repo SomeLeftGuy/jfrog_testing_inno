@@ -58,15 +58,15 @@ jobs:
         env:
           Build_input: $${{inputs.build}}
         run: |
-          local BUILD=''
-          if ($Build_input == 'Last'){
-            BUILD = ((jf rt s "generic-local/jfrog_test/Build" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[0]
-          } else{ if ($Build_input == 'PreLast'){
-            BUILD = ((jf rt s "generic-local/jfrog_test/Build" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[1]
-          } else{ if ($Build_input == PrePreLast){
-            BUILD = ((jf rt s "generic-local/jfrog_test/Build" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[2]
+          $BUILD=''
+          if ($Build_input = 'Last'){
+            $BUILD = ((jf rt s "generic-local/jfrog_test/Build" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[0]
+          } else { if ($Build_input = 'PreLast'){
+            $BUILD = ((jf rt s "generic-local/jfrog_test/Build" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[1]
+          } else { if ($Build_input = 'PrePreLast'){
+            $BUILD = ((jf rt s "generic-local/jfrog_test/Build" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[2]
           }}}
-          echo "BUILD=$BUILD" >> $GITHUB_ENV
+          echo $BUILD >> $GITHUB_ENV
       - name: Push build to Artifactory
    
         run: |
