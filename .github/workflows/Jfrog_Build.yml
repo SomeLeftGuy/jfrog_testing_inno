@@ -43,6 +43,9 @@ jobs:
         
       - name: Setup jq
         uses: vegardit/gha-setup-jq@v1
+        with:
+          version: any
+          use-cache: true
         
       #Setting up jfrog and adding server
       - name: Setup Jfrog
