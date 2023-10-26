@@ -42,7 +42,9 @@ jobs:
       #   uses: tj-actions/branch-names@v7
         
       - run: '[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12'
+        id: tls
       - name: Install jq
+        if: steps.tls.outcome == 'success'
         uses: dcarbone/install-jq-action@v2.0.2
         
       #Setting up jfrog and adding server
