@@ -56,7 +56,7 @@ jobs:
           jf c add --url=http://10.202.15.58:8082 --user="github" --password="${{secrets.JFROG_PASSWORD}}" --interactive=false --insecure-tls=true
       - name: Check and set build env
         env:
-          Build_input: $${{inputs.build}}
+          Build_input: ${{inputs.build}}
         run: |
           $BUILD=''
           if ($Build_input = 'Last'){
