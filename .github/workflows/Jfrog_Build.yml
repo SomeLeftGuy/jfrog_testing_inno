@@ -41,11 +41,8 @@ jobs:
       #   id: branch-name
       #   uses: tj-actions/branch-names@v7
         
-      - name: Setup jq
-        uses: vegardit/gha-setup-jq@v1
-        with:
-          version: any
-          use-cache: true
+      - name: 'Setup jq'
+        uses: dcarbone/install-jq-action@v2
         
       #Setting up jfrog and adding server
       - name: Setup Jfrog
