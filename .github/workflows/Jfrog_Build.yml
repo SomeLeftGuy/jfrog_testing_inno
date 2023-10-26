@@ -41,7 +41,7 @@ jobs:
       #   id: branch-name
       #   uses: tj-actions/branch-names@v7
         
-                 
+      - run: '[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12'
       - name: Install jq
         uses: dcarbone/install-jq-action@v2.0.2
         
