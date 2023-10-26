@@ -15,12 +15,13 @@ on:
     inputs:
       build:
         type: choice
+        default: 'Last'
         description: Number of build
         options:
         - 'Last'
         - 'PreLast'
         - 'PrePreLast'
-        default: 'Last'
+        
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -79,6 +80,6 @@ jobs:
       - name: Push build to Artifactory
    
         run: |
-          jf rt u "index.html" generic-local/jfrog_test/Build/Build-${{env.BUILD}}.txt
+          jf rt u "index.html" generic-local/jfrog_test/Build/Build-$BUILD.txt
           
           jf rt build-publish latest 1
