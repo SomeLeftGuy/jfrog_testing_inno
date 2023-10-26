@@ -41,11 +41,11 @@ jobs:
       #   id: branch-name
       #   uses: tj-actions/branch-names@v7
         
-      - run: '[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12'
-        id: tls
-      - name: Install jq
-        if: steps.tls.outcome == 'success'
-        uses: dcarbone/install-jq-action@v2.0.2
+      # - run: '[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12'
+      #   id: tls
+      # - name: Install jq
+      #   if: steps.tls.outcome == 'success'
+      #   uses: dcarbone/install-jq-action@v2.0.2
         
       #Setting up jfrog and adding server
       - name: Setup Jfrog
@@ -54,19 +54,19 @@ jobs:
           JF_ACCESS_TOKEN: ${{secrets.JFROG_PASSWORD}}
       - run: |
           jf c add --url=http://10.202.15.58:8082 --user="github" --password="${{secrets.JFROG_PASSWORD}}" --interactive=false --insecure-tls=true
-      - run: ::set-output name=build::$( (([System.Collections.ArrayList]((jf rt s "generic-local/jfrog_test/" | jq 'map(.path)') -replace '[a-zA-z-\[\]\"/,]').TrimEnd(".") | where{$_ -ne ""}) | Sort-Object -Descending)[0]) 
+      - run: ::set-output name=build::$(((jf rt s "generic-local/jfrog_test/" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[0]) 
         id: last    
-      - run: ::set-output name=build::$( (([System.Collections.ArrayList]((jf rt s "generic-local/jfrog_test/" | jq 'map(.path)') -replace '[a-zA-z-\[\]\"/,]').TrimEnd(".") | where{$_ -ne ""}) | Sort-Object -Descending)[1]) 
+      - run: ::set-output name=build::$(((jf rt s "generic-local/jfrog_test/" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[1]) 
         id: prelast 
-      - run: ::set-output name=build::$( (([System.Collections.ArrayList]((jf rt s "generic-local/jfrog_test/" | jq 'map(.path)') -replace '[a-zA-z-\[\]\"/,]').TrimEnd(".") | where{$_ -ne ""}) | Sort-Object -Descending)[2]) 
+      - run: ::set-output name=build::$(((jf rt s "generic-local/jfrog_test/" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[2]) 
         id: preprelast 
       - name: Push build to Artifactory
         env: 
         # This abomination gets current build number, don't ask
         #[array](ls).name.Trim(".txt") -replace '[a-zA-z-]'
-           Last_Build: $( (([System.Collections.ArrayList]((jf rt s "generic-local/jfrog_test/" | jq 'map(.path)') -replace '[a-zA-z-\[\]\"/,]').TrimEnd(".") | where{$_ -ne ""}) | Sort-Object -Descending)[0])
-           PreLast_Build: $( (([System.Collections.ArrayList]((jf rt s "generic-local/jfrog_test/" | jq 'map(.path)') -replace '[a-zA-z-\[\]\"/,]').TrimEnd(".") | where{$_ -ne ""}) | Sort-Object -Descending)[1])
-           PrePreLast_Build: $( (([System.Collections.ArrayList]((jf rt s "generic-local/jfrog_test/" | jq 'map(.path)') -replace '[a-zA-z-\[\]\"/,]').TrimEnd(".") | where{$_ -ne ""}) | Sort-Object -Descending)[2])
+           Last_Build: $(((jf rt s "generic-local/jfrog_test/" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[0])
+           PreLast_Build: $(((jf rt s "generic-local/jfrog_test/" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[1])
+           PrePreLast_Build: $(((jf rt s "generic-local/jfrog_test/" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[2])
         run: |
           jf rt u "index.html" generic-local/jfrog_test/ --module=jfrog_test:Build:${{github.event.inputs.build}}
           
