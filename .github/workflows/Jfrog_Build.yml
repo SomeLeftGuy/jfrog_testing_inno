@@ -59,13 +59,13 @@ jobs:
           Build_input: $${{inputs.build}}
         run: |
           local BUILD=''
-          if [[$Build_input == 'Last']]; then
+          if ([[$Build_input == 'Last']]){
             BUILD = ((jf rt s "generic-local/jfrog_test/Build" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[0]
-          elif [[$Build_input == 'PreLast']]; then
+          } else if ([[$Build_input == 'PreLast']]){
             BUILD = ((jf rt s "generic-local/jfrog_test/Build" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[1]
-          elif [[$Build_input == PrePreLast]]; then
+          } else if ([[$Build_input == PrePreLast]]){
             BUILD = ((jf rt s "generic-local/jfrog_test/Build" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[2]
-          fi
+          }
           echo "BUILD=$BUILD" >> $GITHUB_ENV
       - name: Push build to Artifactory
    
