@@ -41,8 +41,9 @@ jobs:
       #   id: branch-name
       #   uses: tj-actions/branch-names@v7
         
-      - name: 'Setup jq'
-        uses: dcarbone/install-jq-action@v2
+                 
+      - name: Install jq
+        uses: dcarbone/install-jq-action@v2.0.2
         
       #Setting up jfrog and adding server
       - name: Setup Jfrog
