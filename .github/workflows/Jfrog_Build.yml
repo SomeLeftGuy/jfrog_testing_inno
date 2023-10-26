@@ -17,9 +17,9 @@ on:
         type: choice
         description: Number of build
         options:
-        - Last
-        - PreLast
-        - PrePreLast
+        - 'Last'
+        - 'PreLast'
+        - 'PrePreLast'
         default: 'Last'
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -53,21 +53,29 @@ jobs:
         uses: jfrog/setup-jfrog-cli@v3
         env:
           JF_ACCESS_TOKEN: ${{secrets.JFROG_PASSWORD}}
+          BUILD: ''
       - run: |
           jf c add --url=http://10.202.15.58:8082 --user="github" --password="${{secrets.JFROG_PASSWORD}}" --interactive=false --insecure-tls=true
-      - name: Check and set build env
-        env:
-          Build_input: ${{inputs.build}}
-        run: |
-          $BUILD=''
-          if ($Build_input = 'Last'){
-            $BUILD = ((jf rt s "generic-local/jfrog_test/Build" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[0]
-          } else { if ($Build_input = 'PreLast'){
-            $BUILD = ((jf rt s "generic-local/jfrog_test/Build" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[1]
-          } else { if ($Build_input = 'PrePreLast'){
-            $BUILD = ((jf rt s "generic-local/jfrog_test/Build" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[2]
-          }}}
-          echo $BUILD >> $GITHUB_ENV
+   
+      - if: (github.event.inputs.build == 'Last')
+        run: ${{env.BUILD}} = ((jf rt s "generic-local/jfrog_test/Build" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[0] 
+      - if: (github.event.inputs.build == 'PreLast')
+        run: ${{env.BUILD}} =  ((jf rt s "generic-local/jfrog_test/Build" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[1] 
+      - if: (github.event.inputs.build == 'PrePreLast')
+        run: ${{env.BUILD}} = ((jf rt s "generic-local/jfrog_test/Build" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[2]
+      # - name: Check and set build env
+      #   env:
+      #     Build_input: ${{inputs.build}}
+      #   run: |
+      #     $BUILD=''
+      #     if ($Build_input = 'Last'){
+      #       $BUILD = ((jf rt s "generic-local/jfrog_test/Build" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[0]
+      #     } else { if ($Build_input = 'PreLast'){
+      #       $BUILD = ((jf rt s "generic-local/jfrog_test/Build" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[1]
+      #     } else { if ($Build_input = 'PrePreLast'){
+      #       $BUILD = ((jf rt s "generic-local/jfrog_test/Build" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[2]
+      #     }}}
+      #     echo $BUILD >> $GITHUB_ENV
       - name: Push build to Artifactory
    
         run: |
