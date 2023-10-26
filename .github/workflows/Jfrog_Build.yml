@@ -17,9 +17,9 @@ on:
         type: choice
         description: Number of build
         options:
-        - steps.last.outputs.build
-        - steps.prelast.outputs.build
-        - steps.preprelast.outputs.build
+        - Last
+        - PreLast
+        - PrePreLast
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -54,20 +54,22 @@ jobs:
           JF_ACCESS_TOKEN: ${{secrets.JFROG_PASSWORD}}
       - run: |
           jf c add --url=http://10.202.15.58:8082 --user="github" --password="${{secrets.JFROG_PASSWORD}}" --interactive=false --insecure-tls=true
-      - run: echo ::set-output name=build::$(((jf rt s "generic-local/jfrog_test/" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[0]) 
-        id: last    
-      - run: echo ::set-output name=build::$(((jf rt s "generic-local/jfrog_test/" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[1]) 
-        id: prelast 
-      - run: echo ::set-output name=build::$(((jf rt s "generic-local/jfrog_test/" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[2]) 
-        id: preprelast 
-      - name: Push build to Artifactory
-        env: 
-        # This abomination gets current build number, don't ask
-        #[array](ls).name.Trim(".txt") -replace '[a-zA-z-]'
-           Last_Build: $(((jf rt s "generic-local/jfrog_test/" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[0])
-           PreLast_Build: $(((jf rt s "generic-local/jfrog_test/" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[1])
-           PrePreLast_Build: $(((jf rt s "generic-local/jfrog_test/" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[2])
+      - name: Check and set build env
+        env:
+          Build_input: $${{inputs.build}}
         run: |
-          jf rt u "index.html" generic-local/jfrog_test/ --module=jfrog_test:Build:${{github.event.inputs.build}}
+          local BUILD=''
+          if [[$Build_input == 'Last']]; then
+            BUILD = ((jf rt s "generic-local/jfrog_test/Build" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[0]
+          elif [[$Build_input == 'PreLast']]; then
+            BUILD = ((jf rt s "generic-local/jfrog_test/Build" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[1]
+          elif [[$Build_input == PrePreLast]]; then
+            BUILD = ((jf rt s "generic-local/jfrog_test/Build" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[2]
+          fi
+          echo "BUILD=$BUILD" >> $GITHUB_ENV
+      - name: Push build to Artifactory
+   
+        run: |
+          jf rt u "index.html" generic-local/jfrog_test/Build/Build-${{env.BUILD}}.txt
           
           jf rt build-publish latest 1
