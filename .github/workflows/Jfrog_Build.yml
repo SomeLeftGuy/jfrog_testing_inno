@@ -12,7 +12,14 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-
+    inputs:
+      build:
+        type: choice
+        description: Number of build
+        options:
+        - steps.last.outputs.build
+        - steps.prelast.outputs.build
+        - steps.preprelast.outputs.build
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -44,13 +51,20 @@ jobs:
           JF_ACCESS_TOKEN: ${{secrets.JFROG_PASSWORD}}
       - run: |
           jf c add --url=http://10.202.15.58:8082 --user="github" --password="${{secrets.JFROG_PASSWORD}}" --interactive=false --insecure-tls=true
-        
+      - run: ::set-output name=build::$( (([System.Collections.ArrayList]((jf rt s "generic-local/jfrog_test/" | jq 'map(.path)') -replace '[a-zA-z-\[\]\"/,]').TrimEnd(".") | where{$_ -ne ""}) | Sort-Object -Descending)[0]) 
+        id: last    
+      - run: ::set-output name=build::$( (([System.Collections.ArrayList]((jf rt s "generic-local/jfrog_test/" | jq 'map(.path)') -replace '[a-zA-z-\[\]\"/,]').TrimEnd(".") | where{$_ -ne ""}) | Sort-Object -Descending)[1]) 
+        id: prelast 
+      - run: ::set-output name=build::$( (([System.Collections.ArrayList]((jf rt s "generic-local/jfrog_test/" | jq 'map(.path)') -replace '[a-zA-z-\[\]\"/,]').TrimEnd(".") | where{$_ -ne ""}) | Sort-Object -Descending)[2]) 
+        id: preprelast 
       - name: Push build to Artifactory
         env: 
         # This abomination gets current build number, don't ask
         #[array](ls).name.Trim(".txt") -replace '[a-zA-z-]'
-           BUILD_NUMBER: $(jf rt s "generic-local" | jq 'map(.props."build.number")' | grep -Eo '[0-9]{1,9}')
+           Last_Build: $( (([System.Collections.ArrayList]((jf rt s "generic-local/jfrog_test/" | jq 'map(.path)') -replace '[a-zA-z-\[\]\"/,]').TrimEnd(".") | where{$_ -ne ""}) | Sort-Object -Descending)[0])
+           PreLast_Build: $( (([System.Collections.ArrayList]((jf rt s "generic-local/jfrog_test/" | jq 'map(.path)') -replace '[a-zA-z-\[\]\"/,]').TrimEnd(".") | where{$_ -ne ""}) | Sort-Object -Descending)[1])
+           PrePreLast_Build: $( (([System.Collections.ArrayList]((jf rt s "generic-local/jfrog_test/" | jq 'map(.path)') -replace '[a-zA-z-\[\]\"/,]').TrimEnd(".") | where{$_ -ne ""}) | Sort-Object -Descending)[2])
         run: |
-          jf rt u "index.html" generic-local --build-number=$BUILD_NUMBER
+          jf rt u "index.html" generic-local/jfrog_test/ --module=jfrog_test:Build:${{github.event.inputs.build}}
           
           jf rt build-publish latest 1
