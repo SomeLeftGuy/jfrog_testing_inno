@@ -40,9 +40,9 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
       
-      - if: ${{github.event_name}} == 'pull_request' || 'push'
-        env: 
-          github.event.inputs.build: Last
+      # - if: ${{github.event_name}} == 'pull_request' || 'push'
+      #   env: 
+      #     github.event.inputs.build: Last
       #Setting up jfrog and adding server
       - name: Setup Jfrog
         uses: jfrog/setup-jfrog-cli@v3
@@ -52,7 +52,7 @@ jobs:
       - run: |
           jf c add --url=http://10.202.15.58:8082 --user="github" --password="${{secrets.JFROG_PASSWORD}}" --interactive=false --insecure-tls=true
    
-      - if: (github.event.inputs.build == 'Last')
+      - if: (github.event.inputs.build == 'Last' || (github.event_name) == 'pull_request'||'push')
         run: echo ("BUILD=" + ((jf rt s "generic-local/jfrog_test/Build/" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[0]) >> $env:GITHUB_ENV
       - if: (github.event.inputs.build == 'PreLast')
         run: echo ("BUILD=" + ((jf rt s "generic-local/jfrog_test/Build/" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[1]) >> $env:GITHUB_ENV
