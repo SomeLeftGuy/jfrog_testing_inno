@@ -41,7 +41,8 @@ jobs:
       - uses: actions/checkout@v3
       
       - if: ${{github.event_name}} == 'pull_request' || 'push'
-        run: echo "BUILD=Last" >> $env:GITHUB_ENV
+        env: 
+          github.event.inputs.build: Last
       #Setting up jfrog and adding server
       - name: Setup Jfrog
         uses: jfrog/setup-jfrog-cli@v3
