@@ -48,7 +48,7 @@ jobs:
           BUILD: ''
       - run: |
           jf c add --url=http://10.202.15.58:8082 --user="github" --password="${{secrets.JFROG_PASSWORD}}" --interactive=false --insecure-tls=true
-      - if: (github.event_name) == 'workflow_run')
+      - if: (github.event_name == 'workflow_run')
         run: echo ("BUILD=" + ([math]::Round(([float]((jf rt s "generic-local/jfrog_test/Build/" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[0])+0.1,4))) >> $env:GITHUB_ENV
       - if: (github.event.inputs.build == 'Last')
         run: echo ("BUILD=" + ((jf rt s "generic-local/jfrog_test/Build/" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[0]) >> $env:GITHUB_ENV
