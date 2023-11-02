@@ -10,4 +10,4 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Echoing
-          run: echo "This is build job"
+        run: echo "This is build job"
