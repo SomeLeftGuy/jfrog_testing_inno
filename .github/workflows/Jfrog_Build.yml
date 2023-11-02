@@ -1,14 +1,13 @@
-# This is a basic workflow to help you get started with Actions
-
-name: Jfrog_Build
-# Bruh
+name: Deploy
 # Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  workflow_run:
+    workflow: ["Build"]
+    branches: [main]
+    types:
+      - completed
+
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -16,7 +15,6 @@ on:
       build:
         type: choice
         required: true 
-        default: 'Last'
         description: Number of build
         options:
         - 'Last'
@@ -36,13 +34,12 @@ jobs:
     runs-on: self-hosted
 
     # Steps represent a sequence of tasks that will be executed as part of the job
+    if: ${{github.event.workflow_run.conclusion == 'success'}}
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
       
-      # - if: ${{github.event_name}} == 'pull_request' || 'push'
-      #   env: 
-      #     github.event.inputs.build: Last
+   
       #Setting up jfrog and adding server
       - name: Setup Jfrog
         uses: jfrog/setup-jfrog-cli@v3
@@ -51,8 +48,9 @@ jobs:
           BUILD: ''
       - run: |
           jf c add --url=http://10.202.15.58:8082 --user="github" --password="${{secrets.JFROG_PASSWORD}}" --interactive=false --insecure-tls=true
-   
-      - if: (github.event.inputs.build == 'Last' || (github.event_name) == 'pull_request'||'push')
+      - if: (github.event_name) == 'workflow_run')
+        run: echo ("BUILD=" + [math]::Round(([float]((jf rt s "generic-local/jfrog_test/Build/" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[0])+0.1,4)) >> $env:GITHUB_ENV
+      - if: (github.event.inputs.build == 'Last')
         run: echo ("BUILD=" + ((jf rt s "generic-local/jfrog_test/Build/" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[0]) >> $env:GITHUB_ENV
       - if: (github.event.inputs.build == 'PreLast')
         run: echo ("BUILD=" + ((jf rt s "generic-local/jfrog_test/Build/" | ConvertFrom-Json).path.TrimEnd(".txt") -replace '[a-zA-Z-/_]'| Sort-Object -Descending)[1]) >> $env:GITHUB_ENV
